@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Clickable Card Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: {
+            brand: { 500: '#1d9bf0', 600: '#1a8cd8', 700: '#177cc0' },
+            dark: { 900: '#07090e', 800: '#0f141c', 700: '#18202c', 600: '#232d3d' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-dark-900 text-slate-100 min-h-screen antialiased flex flex-col justify-between">
+  
+  <!-- Header -->
+  <header class="border-b border-dark-700/80 bg-dark-800/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
+          <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-base tracking-tight text-white flex items-center gap-2">
+            Clickable Card Studio
+            <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Active</span>
+          </h1>
+          <p class="text-xs text-slate-400">Deploy high-converting Twitter / X link cards with instant smart redirection</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="#cards-list" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-slate-300 transition-colors">
+          View History (<span id="total-count">0</span>)
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start w-full">
+    
+    <!-- Left: Card Configuration Form -->
+    <div class="lg:col-span-6 bg-dark-800 border border-dark-700/80 rounded-2xl p-6 shadow-xl space-y-5">
+      <div>
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>⚙️</span> Configure Link Card
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">Customize how your card appears on Twitter's timeline</p>
+      </div>
+
+      <!-- Target Smartlink -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+          Destination URL / Smartlink <span class="text-red-400">*</span>
+        </label>
+        <div class="relative">
+          <input 
+            type="url" 
+            id="target-url" 
+            placeholder="https://y2fp2rd.lovingvideochat.com/rdvrl9t" 
+            value="https://y2fp2rd.lovingvideochat.com/rdvrl9t"
+            class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all font-mono"
+            required
+          />
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1">Real visitors will be immediately redirected here when clicking the card</p>
+      </div>
+
+      <!-- Card Title -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+          Card Title <span class="text-red-400">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="card-title" 
+          placeholder="Untitled design" 
+          value="Exclusive Live Video Preview"
+          class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
+          required
+        />
+      </div>
+
+      <!-- Card Description -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+          Card Description
+        </label>
+        <input 
+          type="text" 
+          id="card-desc" 
+          placeholder="From canva.com or click to join" 
+          value="Watch full interactive preview now"
+          class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-all"
+        />
+      </div>
+
+      <!-- Image Source Selection (Upload or URL) -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+          Card Image (1200x630 or 16:9 Recommended)
+        </label>
+        
+        <div class="space-y-3">
+          <!-- Drag & drop upload box -->
+          <div 
+            id="dropzone"
+            class="border-2 border-dashed border-dark-600 hover:border-brand-500/80 rounded-xl p-4 text-center cursor-pointer transition-colors bg-dark-900/60"
+          >
+            <input type="file" id="image-file" accept="image/*" class="hidden">
+            <div class="flex flex-col items-center justify-center gap-1.5">
+              <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-xs font-semibold text-slate-300">
+                Click to upload from local folder or drag & drop
+              </p>
+              <p class="text-[10px] text-slate-500">PNG, JPG, WEBP, GIF up to 15MB</p>
+            </div>
+          </div>
+
+          <!-- Or Image URL -->
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Or Image URL</span>
+            <div class="h-px bg-dark-700 flex-1"></div>
+          </div>
+
+          <input 
+            type="url" 
+            id="image-url" 
+            placeholder="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200" 
+            class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all font-mono"
+          />
+        </div>
+      </div>
+
+      <!-- Custom Short Slug (Optional) -->
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            Custom Slug (Optional)
+          </label>
+          <input 
+            type="text" 
+            id="custom-slug" 
+            placeholder="e.g. live1, video-preview" 
+            class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all font-mono"
+          />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5">
+            Display Domain (Optional)
+          </label>
+          <input 
+            type="text" 
+            id="card-domain" 
+            placeholder="e.g. canva.com or yoursite.com" 
+            class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all"
+          />
+        </div>
+      </div>
+
+      <!-- Generate Button -->
+      <button 
+        id="btn-generate" 
+        class="w-full py-3 px-5 rounded-xl font-bold text-sm bg-gradient-to-r from-brand-600 to-sky-500 hover:from-brand-500 hover:to-sky-400 text-white shadow-lg shadow-brand-500/25 transition-all transform active:scale-[0.99] flex items-center justify-center gap-2"
+      >
+        <span>⚡</span> Generate Clickable Card Link
+      </button>
+
+      <!-- Output Links Box (Hidden initially) -->
+      <div id="output-box" class="hidden p-4 rounded-xl bg-dark-900 border border-brand-500/40 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+            </svg>
+            Card Link Generated & Ready to Post
+          </span>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Short Card URL (Paste this into X / Twitter):</label>
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="short-url-out" 
+              readonly 
+              class="flex-1 bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-xs text-brand-400 font-mono select-all outline-none"
+            />
+            <button 
+              onclick="copyShortUrl()" 
+              class="px-3.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition-all flex items-center gap-1"
+            >
+              <span>📋</span> Copy
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-400 block mb-1">Direct Query URL (No DB required):</label>
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="direct-url-out" 
+              readonly 
+              class="flex-1 bg-dark-800 border border-dark-600 rounded-lg px-3 py-1.5 text-[11px] text-slate-400 font-mono select-all outline-none truncate"
+            />
+            <button 
+              onclick="copyDirectUrl()" 
+              class="px-2.5 py-1.5 rounded-lg bg-dark-700 hover:bg-dark-600 text-slate-200 text-xs font-semibold transition-all"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right: Live Twitter Card Simulator -->
+    <div class="lg:col-span-6 space-y-4">
+      <div>
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <span>📱</span> Live Twitter / X Preview
+        </h2>
+        <p class="text-xs text-slate-400 mt-0.5">Real-time simulation of how the card renders on X timeline</p>
+      </div>
+
+      <!-- Twitter Mock Tweet Container -->
+      <div class="bg-black border border-neutral-800 rounded-2xl p-4 shadow-2xl space-y-3 font-sans">
+        
+        <!-- Tweet Author Header -->
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center font-bold text-black text-sm shadow">
+              🗲
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-sm text-white hover:underline cursor-pointer">Official Channel</span>
+                <svg class="w-4 h-4 text-brand-500" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.79-4-4-4-.495 0-.965.084-1.4.238C14.55 2.475 13.18 1.6 11.6 1.6c-1.58 0-2.95.875-3.6 2.148-.435-.154-.905-.238-1.4-.238-2.21 0-4 1.79-4 4 0 .495.084.965.238 1.4C1.575 9.55.7 10.92.7 12.5c0 1.58.875 2.95 2.148 3.6-.154.435-.238.905-.238 1.4 0 2.21 1.79 4 4 4 .495 0 .965-.084 1.4-.238 1.05 1.273 2.42 2.148 4 2.148 1.58 0 2.95-.875 3.6-2.148.435.154.905.238 1.4.238 2.21 0 4-1.79 4-4 0-.495-.084-.965-.238-1.4 1.273-1.05 2.148-2.42 2.148-4zm-12.8 4.2L5.4 12.4l1.4-1.4 2.9 2.9 6.9-6.9 1.4 1.4-8 8.3z"/>
+                </svg>
+                <span class="text-xs text-neutral-500">@official · Just now</span>
+              </div>
+              <p class="text-xs text-neutral-300 mt-0.5">Check out the exclusive preview below! 👇</p>
+            </div>
+          </div>
+          <button class="text-neutral-500 hover:text-neutral-300">•••</button>
+        </div>
+
+        <!-- The Twitter Clickable Link Card -->
+        <div class="border border-neutral-800 rounded-2xl overflow-hidden hover:bg-neutral-900/40 transition-colors cursor-pointer group">
+          
+          <!-- Image Container -->
+          <div class="relative w-full aspect-[1.91/1] bg-neutral-900 flex items-center justify-center overflow-hidden">
+            <img 
+              id="preview-img" 
+              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" 
+              alt="Card Preview" 
+              class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            />
+            <div id="no-img-placeholder" class="hidden absolute inset-0 bg-neutral-900 flex flex-col items-center justify-center text-neutral-500">
+              <svg class="w-12 h-12 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span class="text-xs">Upload or specify image URL</span>
+            </div>
+          </div>
+
+          <!-- Bottom Card Meta Box -->
+          <div class="p-3 bg-neutral-950 border-t border-neutral-900 space-y-0.5">
+            <p id="preview-domain" class="text-[11px] text-neutral-400 truncate">
+              y2fp2rd.lovingvideochat.com
+            </p>
+            <h3 id="preview-title" class="text-sm font-semibold text-white truncate">
+              Exclusive Live Video Preview
+            </h3>
+            <p id="preview-desc" class="text-xs text-neutral-400 truncate">
+              Watch full interactive preview now
+            </p>
+          </div>
+        </div>
+
+        <!-- Twitter Actions Mock -->
+        <div class="flex items-center justify-between text-neutral-500 pt-1 text-xs px-2">
+          <span class="flex items-center gap-1.5 hover:text-sky-400 cursor-pointer">💬 14</span>
+          <span class="flex items-center gap-1.5 hover:text-emerald-400 cursor-pointer">🔁 28</span>
+          <span class="flex items-center gap-1.5 hover:text-rose-400 cursor-pointer">❤️ 152</span>
+          <span class="flex items-center gap-1.5 hover:text-sky-400 cursor-pointer">📊 3.4K</span>
+          <span class="hover:text-neutral-300 cursor-pointer">🔖</span>
+        </div>
+
+      </div>
+
+      <!-- Quick Usage Guide -->
+      <div class="bg-dark-800/80 border border-dark-700/80 rounded-2xl p-5 space-y-3">
+        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+          <span>💡</span> How to Post to X / Twitter
+        </h3>
+        <ul class="text-xs text-slate-400 space-y-2 leading-relaxed">
+          <li class="flex items-start gap-2">
+            <span class="text-brand-400 font-bold">1.</span>
+            <span>Click <strong>Generate Card Link</strong> and copy the Short Card URL.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-brand-400 font-bold">2.</span>
+            <span>Paste the URL into your tweet text in <strong>X-Account-Manager</strong> (Bulk Compose or Scheduler).</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-brand-400 font-bold">3.</span>
+            <span>X automatically renders this exact high-converting preview card, and all clicks route to your smartlink.</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-dark-700/60 py-4 text-center text-xs text-slate-500 bg-dark-900">
+    <p>Clickable Card Studio &copy; 2026 · Autonomous Twitter Card Delivery System</p>
+  </footer>
+
+  <script>
+    const targetUrlInput = document.getElementById('target-url');
+    const titleInput = document.getElementById('card-title');
+    const descInput = document.getElementById('card-desc');
+    const imageUrlInput = document.getElementById('image-url');
+    const domainInput = document.getElementById('card-domain');
+    const fileInput = document.getElementById('image-file');
+    const dropzone = document.getElementById('dropzone');
+
+    const previewTitle = document.getElementById('preview-title');
+    const previewDesc = document.getElementById('preview-desc');
+    const previewDomain = document.getElementById('preview-domain');
+    const previewImg = document.getElementById('preview-img');
+    const noImgPlaceholder = document.getElementById('no-img-placeholder');
+
+    function updatePreview() {
+      previewTitle.textContent = titleInput.value.trim() || 'Untitled Card';
+      previewDesc.textContent = descInput.value.trim() || 'Click to view full preview';
+      
+      let domain = domainInput.value.trim();
+      if (!domain) {
+        try {
+          const u = new URL(targetUrlInput.value.trim());
+          domain = u.hostname;
+        } catch {
+          domain = 'canva.com';
+        }
+      }
+      previewDomain.textContent = domain;
+
+      const imgVal = imageUrlInput.value.trim();
+      if (imgVal) {
+        previewImg.src = imgVal;
+        previewImg.classList.remove('hidden');
+        noImgPlaceholder.classList.add('hidden');
+      } else {
+        previewImg.classList.add('hidden');
+        noImgPlaceholder.classList.remove('hidden');
+      }
+    }
+
+    [targetUrlInput, titleInput, descInput, imageUrlInput, domainInput].forEach(el => {
+      el.addEventListener('input', updatePreview);
+    });
+
+    // Handle File Dropzone & Upload
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('border-brand-500', 'bg-dark-800');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('border-brand-500', 'bg-dark-800');
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('border-brand-500', 'bg-dark-800');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        uploadFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files && fileInput.files[0]) {
+        uploadFile(fileInput.files[0]);
+      }
+    });
+
+    async function uploadFile(file) {
+      dropzone.innerHTML = `<p class="text-xs text-brand-400 font-semibold animate-pulse">Uploading ${file.name}...</p>`;
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+          imageUrlInput.value = data.imageUrl;
+          updatePreview();
+          dropzone.innerHTML = `<p class="text-xs text-emerald-400 font-semibold">✓ ${file.name} uploaded successfully</p>`;
+        } else {
+          alert('Upload failed: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err) {
+        alert('Upload failed: ' + err.message);
+      }
+    }
+
+    // Generate Card Link
+    document.getElementById('btn-generate').addEventListener('click', async () => {
+      const target = targetUrlInput.value.trim();
+      const title = titleInput.value.trim();
+      const description = descInput.value.trim();
+      const image = imageUrlInput.value.trim();
+      const customSlug = document.getElementById('custom-slug').value.trim();
+      const domain = domainInput.value.trim();
+
+      if (!target) {
+        alert('Please enter a destination target URL');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ target, title, description, image, customSlug, domain })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById('output-box').classList.remove('hidden');
+          document.getElementById('short-url-out').value = data.shortUrl;
+          document.getElementById('direct-url-out').value = data.directUrl;
+          loadHistory();
+        } else {
+          alert('Error creating card: ' + data.error);
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    });
+
+    function copyShortUrl() {
+      const input = document.getElementById('short-url-out');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert('Copied Short Card URL to clipboard!');
+    }
+
+    function copyDirectUrl() {
+      const input = document.getElementById('direct-url-out');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      alert('Copied Direct Query URL to clipboard!');
+    }
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/cards');
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('total-count').textContent = data.count || 0;
+        }
+      } catch {}
+    }
+
+    updatePreview();
+    loadHistory();
+  </script>
+</body>
+</html>
