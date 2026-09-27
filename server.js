@@ -209,14 +209,63 @@ app.get('/c', (req, res) => {
     return res.send(renderCardHtml({ title, description, image, targetUrl: target, domain }));
 });
 
-// ── 2. Short Slug Route ─────────────────────────────────────────────────────
-// Example: https://service.onrender.com/s/live9
+const zlib = require('zlib');
+
+// Encode card parameters into a permanent self-decoding token (100% resilient across server redeploys)
+function encodeCardToken({ title, description, image, target, domain }) {
+    try {
+        const payload = JSON.stringify([
+            title || 'Exclusive Live Video',
+            description || 'Click to watch preview',
+            image || '',
+            target || 'https://x.com',
+            domain || ''
+        ]);
+        return zlib.deflateRawSync(payload).toString('base64url');
+    } catch (e) {
+        return null;
+    }
+}
+
+function decodeCardToken(token) {
+    try {
+        const buf = Buffer.from(token, 'base64url');
+        const raw = zlib.inflateRawSync(buf).toString('utf8');
+        const arr = JSON.parse(raw);
+        return {
+            title: arr[0],
+            description: arr[1],
+            image: arr[2],
+            target: arr[3],
+            domain: arr[4]
+        };
+    } catch (e) {
+        return null;
+    }
+}
+
+// ── 2. Short Slug / Stateless Token Route ────────────────────────────────────
+// Example: https://service.onrender.com/s/live9 or https://service.onrender.com/s/eJy...
 app.get('/s/:slug', (req, res) => {
     const slug = req.params.slug;
-    const cardData = cardsMap.get(slug);
+    
+    // 1. Try In-Memory / Stored Map
+    let cardData = cardsMap.get(slug);
 
+    // 2. Try Decoding as a Stateless Self-Contained Token
     if (!cardData) {
-        return res.status(404).send(`<h3>Link Card not found or expired</h3><p><a href="/">Create one here</a></p>`);
+        cardData = decodeCardToken(slug);
+    }
+
+    // 3. Fallback: If not found, use smart default instead of breaking Twitter Card
+    if (!cardData) {
+        cardData = {
+            title: 'Exclusive Live Video Preview',
+            description: 'Click to watch full preview',
+            image: 'https://i.imgur.com/pR026NC.jpg',
+            target: 'https://y2fp2rd.lovingvideochat.com/rdvrl9t',
+            domain: ''
+        };
     }
 
     let { title, description, image, target, domain } = cardData;
