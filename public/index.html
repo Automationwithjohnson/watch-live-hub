@@ -135,16 +135,23 @@
 
           <!-- Or Image URL -->
           <div class="flex items-center gap-2">
-            <span class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Or Image URL</span>
+            <span class="text-[10px] text-brand-400 font-bold uppercase tracking-wider flex items-center gap-1">
+              <span>🖼️</span> Paste Imgur or Image URL
+            </span>
             <div class="h-px bg-dark-700 flex-1"></div>
           </div>
 
-          <input 
-            type="url" 
-            id="image-url" 
-            placeholder="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200" 
-            class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all font-mono"
-          />
+          <div>
+            <input 
+              type="url" 
+              id="image-url" 
+              placeholder="https://imgur.com/pR026NC (paste any Imgur link)" 
+              class="w-full bg-dark-900 border border-dark-600 focus:border-brand-500 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 outline-none transition-all font-mono"
+            />
+            <p id="imgur-badge" class="hidden text-[11px] text-emerald-400 font-semibold items-center gap-1 mt-1">
+              <span>✓</span> Imgur link auto-formatted for full HD Twitter Card
+            </p>
+          </div>
         </div>
       </div>
 
@@ -383,9 +390,19 @@
           domain = 'canva.com';
         }
       }
-      previewDomain.textContent = domain;
+      const rawImg = imageUrlInput.value.trim();
+      const imgurBadge = document.getElementById('imgur-badge');
+      if (imgurBadge) {
+        if (/imgur\.com/i.test(rawImg)) {
+          imgurBadge.classList.remove('hidden');
+          imgurBadge.classList.add('flex');
+        } else {
+          imgurBadge.classList.add('hidden');
+          imgurBadge.classList.remove('flex');
+        }
+      }
 
-      let imgVal = resolveDirectImageUrl(imageUrlInput.value.trim());
+      let imgVal = resolveDirectImageUrl(rawImg);
       if (imgVal) {
         previewImg.src = imgVal;
         previewImg.classList.remove('hidden');
