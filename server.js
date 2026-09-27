@@ -70,6 +70,25 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;');
 }
 
+// Helper: Auto-convert Imgur / host URLs to direct image links
+function resolveDirectImageUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    let trimmed = url.trim();
+
+    // Imgur URL normalizer (handles https://imgur.com/pR026NC, /a/xyz, /gallery/xyz, etc.)
+    if (/imgur\.com/i.test(trimmed)) {
+        const match = trimmed.match(/imgur\.com\/(?:a\/|gallery\/)?([a-zA-Z0-9]+)(?:\.[a-zA-Z]{3,4})?/i);
+        if (match && match[1]) {
+            const id = match[1];
+            if (trimmed.includes('i.imgur.com') && /\.(jpg|jpeg|png|gif|webp)$/i.test(trimmed)) {
+                return trimmed;
+            }
+            return `https://i.imgur.com/${id}.jpg`;
+        }
+    }
+    return trimmed;
+}
+
 // Helper: Detect whether the incoming request is a Social Crawler (Twitterbot, Discord, etc.)
 function isSocialBot(userAgent = '') {
     const ua = userAgent.toLowerCase();
@@ -80,7 +99,8 @@ function isSocialBot(userAgent = '') {
 function renderCardHtml({ title, description, image, targetUrl, domain }) {
     const safeTitle = escapeHtml(title || 'Exclusive Preview');
     const safeDesc = escapeHtml(description || 'Click to watch live content');
-    const safeImage = escapeHtml(image || '');
+    const directImage = resolveDirectImageUrl(image);
+    const safeImage = escapeHtml(directImage || '');
     const safeTarget = targetUrl || 'https://x.com';
 
     return `<!DOCTYPE html>

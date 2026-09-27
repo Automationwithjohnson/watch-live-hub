@@ -273,6 +273,7 @@
               id="preview-img" 
               src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&auto=format&fit=crop&q=80" 
               alt="Card Preview" 
+              referrerpolicy="no-referrer"
               class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
             />
             <div id="no-img-placeholder" class="hidden absolute inset-0 bg-neutral-900 flex flex-col items-center justify-center text-neutral-500">
@@ -353,6 +354,22 @@
     const previewImg = document.getElementById('preview-img');
     const noImgPlaceholder = document.getElementById('no-img-placeholder');
 
+    function resolveDirectImageUrl(url) {
+      if (!url || typeof url !== 'string') return '';
+      let trimmed = url.trim();
+      if (/imgur\.com/i.test(trimmed)) {
+        const match = trimmed.match(/imgur\.com\/(?:a\/|gallery\/)?([a-zA-Z0-9]+)(?:\.[a-zA-Z]{3,4})?/i);
+        if (match && match[1]) {
+          const id = match[1];
+          if (trimmed.includes('i.imgur.com') && /\.(jpg|jpeg|png|gif|webp)$/i.test(trimmed)) {
+            return trimmed;
+          }
+          return `https://i.imgur.com/${id}.jpg`;
+        }
+      }
+      return trimmed;
+    }
+
     function updatePreview() {
       previewTitle.textContent = titleInput.value.trim() || 'Untitled Card';
       previewDesc.textContent = descInput.value.trim() || 'Click to view full preview';
@@ -368,7 +385,7 @@
       }
       previewDomain.textContent = domain;
 
-      const imgVal = imageUrlInput.value.trim();
+      let imgVal = resolveDirectImageUrl(imageUrlInput.value.trim());
       if (imgVal) {
         previewImg.src = imgVal;
         previewImg.classList.remove('hidden');
@@ -430,7 +447,7 @@
       const target = targetUrlInput.value.trim();
       const title = titleInput.value.trim();
       const description = descInput.value.trim();
-      const image = imageUrlInput.value.trim();
+      const image = resolveDirectImageUrl(imageUrlInput.value.trim());
       const customSlug = document.getElementById('custom-slug').value.trim();
       const domain = domainInput.value.trim();
 
